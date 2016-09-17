@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block 'body' %}
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <h3 class="page-header">命令执行</h3>
+  <div class="table-responsive">
+  <input id="command_id"  name='command' >
+  <button id="command_active" type="button" class="btn btn-success">执行命令</button>
+
+  </div>
+  <div style="height:500px;width: 600px" id="res_out"></div>
+</div>
+{% end %}
+
+{% block 'bottom' %}
+<script type="text/javascript">
+  $(function () {
+    $("#command_active").click(function(){
+        var data = {
+            command:$("#command_id").val()
+        };
+        var ws = new WebSocket("ws://192.168.17.128:8080/send/");
+        //制空res div 并请求
+        $("#res_out").empty();
+        ws.onopen = function(){
+            ws.send(JSON.stringify(data));
+        };
+        ws.onmessage = function(event){
+            var out_data = JSON.parse(event.data);
+            $("#res_out").append(out_data.res+'</br>')
+        };
+
+        ws.close = function (event) {
+            $("#res_out").append("end")
+        };
+
+    })
+  });
+
+</script>
+{% end %}
